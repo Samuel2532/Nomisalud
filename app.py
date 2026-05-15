@@ -897,10 +897,46 @@ def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
+# ============ ERROR HANDLERS ============
+# Return JSON for all errors on /api/ routes so the frontend never sees HTML.
+
+@app.errorhandler(404)
+def not_found(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Ruta no encontrada", "path": request.path}), 404
+    return e
+
+@app.errorhandler(500)
+def server_error(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Error interno del servidor", "detail": str(e)}), 500
+    return e
+
+@app.errorhandler(Exception)
+def unhandled(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": type(e).__name__, "detail": str(e)}), 500
+    raise e
+
+@app.route("/api/health")
+def api_health():
+    """Public endpoint to verify the app is running and the DB is reachable."""
+    try:
+        db = get_db()
+        user_count = db.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0]
+        db.close()
+        return jsonify({"status": "ok", "usuarios": user_count, "vercel": _IS_VERCEL})
+    except Exception as e:
+        return jsonify({"status": "error", "detail": str(e)}), 500
+
+
 # ============ INIT ============
 
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-init_db()
+try:
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    init_db()
+except Exception as e:
+    print(f"STARTUP ERROR: {e}")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
