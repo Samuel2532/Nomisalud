@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomisalud — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--teal-900:#064E3B;--teal-800:#065F46;--teal-700:#047857;--teal-600:#059669;--teal-500:#10B981;--teal-400:#34D399;--teal-300:#6EE7B7;--teal-200:#A7F3D0;--teal-100:#D1FAE5;--teal-50:#ECFDF5;--coral-600:#DC5B3A;--coral-500:#EF7654;--coral-100:#FEF0E7;--slate-900:#0F172A;--slate-800:#1E293B;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748B;--slate-400:#94A3B8;--slate-300:#CBD5E1;--slate-200:#E2E8F0;--slate-100:#F1F5F9;--slate-50:#F8FAFC;--white:#FFF;--red-500:#EF4444;--red-100:#FEE2E2;--amber-500:#F59E0B;--amber-100:#FEF3C7;--green-500:#22C55E;--green-100:#DCFCE7}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--slate-100);color:var(--slate-800);min-height:100vh}
+
+/* Sidebar */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.sidebar{background:var(--slate-900);color:var(--white);padding:24px 0;display:flex;flex-direction:column;position:fixed;width:260px;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:0 24px;display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.sidebar-logo svg{width:32px;height:32px;flex-shrink:0}
+.sidebar-logo span{font-family:'DM Serif Display',serif;font-size:1.2rem}
+.sidebar-nav{flex:1}
+.nav-section{padding:0 16px;margin-bottom:24px}
+.nav-section-title{font-size:.65rem;font-weight:700;color:var(--slate-500);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:.85rem;font-weight:500;color:var(--slate-400);cursor:pointer;transition:all .2s;margin-bottom:2px}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.08);color:var(--white)}
+.nav-item.active{background:rgba(16,185,129,.15);color:var(--teal-400)}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;opacity:.6}
+.nav-item.active svg{opacity:1}
+.sidebar-user{padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);margin-top:auto}
+.sidebar-user .user-info{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.user-avatar{width:36px;height:36px;border-radius:10px;background:var(--teal-700);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--white);flex-shrink:0}
+.user-name{font-size:.85rem;font-weight:600;color:var(--white)}
+.user-role{font-size:.7rem;color:var(--slate-400);margin-top:1px}
+.logout-btn{width:100%;padding:8px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:transparent;color:var(--slate-400);font-size:.8rem;font-family:inherit;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(239,68,68,.1);color:#FCA5A5;border-color:rgba(239,68,68,.2)}
+
+/* Main Content */
+.main{margin-left:260px;padding:32px;min-height:100vh}
+
+/* Page header */
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--slate-900);letter-spacing:-.5px}
+.header-actions{display:flex;gap:12px}
+.btn{padding:10px 20px;border-radius:10px;font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--teal-700);color:var(--white)}
+.btn-primary:hover{background:var(--teal-800);transform:translateY(-1px);box-shadow:0 4px 12px rgba(5,150,105,.25)}
+.btn-outline{background:var(--white);color:var(--slate-700);border:1.5px solid var(--slate-300)}
+.btn-outline:hover{border-color:var(--teal-400);color:var(--teal-700)}
+.btn-sm{padding:6px 14px;font-size:.78rem;border-radius:8px}
+.btn-danger{background:var(--red-100);color:var(--red-500)}
+
+/* Stats cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border-radius:14px;padding:20px 24px;border:1px solid var(--slate-200)}
+.stat-card .stat-label{font-size:.75rem;font-weight:600;color:var(--slate-500);letter-spacing:.3px;margin-bottom:6px}
+.stat-card .stat-value{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--slate-900);letter-spacing:-1px}
+.stat-card .stat-sub{font-size:.75rem;color:var(--slate-400);margin-top:4px}
+.stat-card.alert .stat-value{color:var(--coral-600)}
+
+/* Content card */
+.card{background:var(--white);border-radius:14px;border:1px solid var(--slate-200);overflow:hidden;margin-bottom:24px}
+.card-header{padding:20px 24px;border-bottom:1px solid var(--slate-200);display:flex;justify-content:space-between;align-items:center}
+.card-header h2{font-size:1rem;font-weight:700;color:var(--slate-900)}
+.card-body{padding:24px}
+
+/* Table */
+.table-wrapper{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:.72rem;font-weight:700;color:var(--slate-500);letter-spacing:.5px;text-transform:uppercase;padding:10px 16px;border-bottom:1px solid var(--slate-200)}
+td{padding:12px 16px;font-size:.85rem;color:var(--slate-700);border-bottom:1px solid var(--slate-100)}
+tr:hover td{background:var(--slate-50)}
+tr{cursor:pointer}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:.7rem;font-weight:600;letter-spacing:.3px}
+.badge-recibida{background:var(--teal-100);color:var(--teal-800)}
+.badge-procesando{background:#EDE9FE;color:#6D28D9}
+.badge-verificacion{background:var(--amber-100);color:#B45309}
+.badge-correccion{background:var(--coral-100);color:var(--coral-600)}
+.badge-transcrita{background:#DBEAFE;color:#1D4ED8}
+.badge-cobrada{background:#E0E7FF;color:#4338CA}
+.badge-rechazada{background:var(--red-100);color:var(--red-500)}
+.badge-juridico{background:#FDF2F8;color:#BE185D}
+.badge-pagada{background:var(--green-100);color:#15803D}
+.badge-archivada{background:var(--slate-200);color:var(--slate-600)}
+.badge-vencida{background:var(--red-100);color:var(--red-500)}
+
+/* Semaforo */
+.semaforo{display:inline-block;width:10px;height:10px;border-radius:50%}
+.semaforo-verde{background:var(--green-500)}
+.semaforo-amarillo{background:var(--amber-500)}
+.semaforo-rojo{background:var(--red-500);animation:pulse-red 1.5s infinite}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+/* Upload modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--white);border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.15)}
+.modal-header{padding:24px 28px;border-bottom:1px solid var(--slate-200);display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-size:1.1rem;font-weight:700;color:var(--slate-900)}
+.modal-close{background:none;border:none;font-size:1.3rem;color:var(--slate-400);cursor:pointer;padding:4px}
+.modal-body{padding:28px}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--slate-200);display:flex;justify-content:flex-end;gap:12px}
+
+/* Form elements */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--slate-700);margin-bottom:6px}
+.form-group select,.form-group input[type="text"],.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--slate-200);border-radius:10px;font-size:.9rem;font-family:inherit;background:var(--slate-50);color:var(--slate-900);transition:all .2s}
+.form-group select:focus,.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--teal-500);background:var(--white);box-shadow:0 0 0 3px rgba(16,185,129,.08)}
+
+/* File upload area */
+.upload-area{border:2px dashed var(--slate-300);border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--slate-50)}
+.upload-area:hover,.upload-area.dragover{border-color:var(--teal-500);background:var(--teal-50)}
+.upload-area svg{margin-bottom:12px}
+.upload-area p{font-size:.9rem;color:var(--slate-500)}
+.upload-area .formats{font-size:.75rem;color:var(--slate-400);margin-top:6px}
+.file-selected{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--teal-50);border:1.5px solid var(--teal-200);border-radius:10px;margin-top:12px}
+.file-selected .file-name{font-size:.85rem;font-weight:500;color:var(--teal-800);flex:1}
+.file-selected .file-size{font-size:.75rem;color:var(--teal-600)}
+.file-selected .remove-file{background:none;border:none;color:var(--red-500);cursor:pointer;font-size:1.1rem}
+
+/* Detail panel */
+.detail-panel{position:fixed;right:0;top:0;width:500px;height:100vh;background:var(--white);box-shadow:-10px 0 40px rgba(0,0,0,.1);z-index:900;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto}
+.detail-panel.open{transform:translateX(0)}
+.detail-header{padding:24px;border-bottom:1px solid var(--slate-200);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--white);z-index:2}
+.detail-body{padding:24px}
+.detail-section{margin-bottom:24px}
+.detail-section h3{font-size:.75rem;font-weight:700;color:var(--slate-500);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.detail-field{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--slate-100);font-size:.85rem}
+.detail-field .label{color:var(--slate-500);font-weight:500}
+.detail-field .value{color:var(--slate-800);font-weight:600;text-align:right;max-width:60%}
+.ocr-preview{background:var(--slate-50);border:1px solid var(--slate-200);border-radius:10px;padding:16px;font-size:.8rem;font-family:'Courier New',monospace;color:var(--slate-700);white-space:pre-wrap;max-height:200px;overflow-y:auto;line-height:1.5}
+.state-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.timeline{list-style:none}
+.timeline li{position:relative;padding:0 0 16px 24px;font-size:.82rem;color:var(--slate-600)}
+.timeline li::before{content:'';position:absolute;left:4px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--teal-500)}
+.timeline li::after{content:'';position:absolute;left:7px;top:16px;width:2px;height:calc(100% - 10px);background:var(--slate-200)}
+.timeline li:last-child::after{display:none}
+.timeline .time{font-size:.72rem;color:var(--slate-400);display:block;margin-top:2px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:12px;font-size:.88rem;font-weight:500;color:var(--white);z-index:2000;transform:translateY(100px);opacity:0;transition:all .3s ease}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--teal-700)}
+.toast.error{background:var(--red-500)}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--slate-400)}
+.empty-state svg{margin-bottom:16px;opacity:.5}
+.empty-state p{font-size:.95rem}
+
+/* Filters */
+.filters{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.filters select{padding:8px 14px;border:1.5px solid var(--slate-200);border-radius:8px;font-size:.82rem;font-family:inherit;background:var(--white);color:var(--slate-700);cursor:pointer}
+.filters select:focus{border-color:var(--teal-500);outline:none}
+
+/* Responsive */
+@media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{display:none}.main{margin-left:0}.stats-grid{grid-template-columns:repeat(2,1fr)}.detail-panel{width:100%}}
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr}.page-header{flex-direction:column;gap:12px;align-items:flex-start}}
+
+/* Section visibility */
+.section{display:none}
+.section.active{display:block}
+
+/* Fraud / suspicious document warning */
+.doc-warning{background:#FFF7ED;border:1.5px solid #F97316;border-radius:12px;padding:16px 18px;margin-bottom:20px}
+.doc-warning-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.doc-warning-icon{width:36px;height:36px;background:#FED7AA;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
+.doc-warning-title{font-size:.9rem;font-weight:700;color:#C2410C}
+.doc-warning-subtitle{font-size:.75rem;color:#EA580C;margin-top:2px}
+.doc-warning-reasons{list-style:none;display:flex;flex-direction:column;gap:6px}
+.doc-warning-reasons li{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:#9A3412;background:#FFEDD5;border-radius:6px;padding:6px 10px}
+.doc-warning-reasons li::before{content:"▲";font-size:.6rem;margin-top:2px;flex-shrink:0;color:#F97316}
+.doc-warning-actions{margin-top:12px;font-size:.78rem;color:#C2410C;font-weight:600;padding-top:10px;border-top:1px solid #FED7AA}
+</style>
+</head>
+<body>
+<div class="layout">
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#065F46"/><path d="M8 16C8 11.58 11.58 8 16 8C20.42 8 24 11.58 24 16" stroke="#34D399" stroke-width="2.5" stroke-linecap="round"/><path d="M12 20V15L16 12L20 15V20" stroke="#A7F3D0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="17" r="2" fill="#6EE7B7"/></svg>
+    <span>Nomisalud</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Principal</div>
+      <div class="nav-item active" onclick="showSection('overview')">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="1" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="1" y="10" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="showSection('incapacidades')">
+        <svg viewBox="0 0 18 18" fill="none"><path d="M4 2h7l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/><path d="M11 2v4h4M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Incapacidades
+      </div>
+    </div>
+    <div class="nav-section" id="nav-admin" style="display:none">
+      <div class="nav-section-title">Administración</div>
+      <div class="nav-item" onclick="showSection('auditoria')">
+        <svg viewBox="0 0 18 18" fill="none"><path d="M2 13l4-4 3 3 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Auditoría
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-info">
+      <div class="user-avatar" id="userAvatar"></div>
+      <div><div class="user-name" id="userName"></div><div class="user-role" id="userRole"></div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- Main content -->
+<main class="main">
+
+<!-- ===== OVERVIEW SECTION ===== -->
+<div class="section active" id="section-overview">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="openUploadModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Nueva incapacidad
+      </button>
+    </div>
+  </div>
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-label">Total incapacidades</div><div class="stat-value" id="statTotal">0</div></div>
+    <div class="stat-card"><div class="stat-label">En verificación</div><div class="stat-value" id="statVerificacion">0</div></div>
+    <div class="stat-card"><div class="stat-label">Alertas activas</div><div class="stat-value" id="statAlertas">0</div></div>
+    <div class="stat-card alert"><div class="stat-label">Alertas críticas</div><div class="stat-value" id="statRojas">0</div><div class="stat-sub"><span class="semaforo semaforo-rojo"></span> Requieren atención inmediata</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>Distribución por estado</h2></div>
+    <div class="card-body"><div id="estadoChart" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h2>Actividad reciente</h2></div>
+    <div class="card-body"><ul class="timeline" id="recentActivity"></ul></div>
+  </div>
+</div>
+
+<!-- ===== INCAPACIDADES SECTION ===== -->
+<div class="section" id="section-incapacidades">
+  <div class="page-header">
+    <h1>Incapacidades</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="openUploadModal()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Nueva incapacidad
+      </button>
+    </div>
+  </div>
+  <div class="filters">
+    <select id="filterEstado" onchange="loadIncapacidades()">
+      <option value="">Todos los estados</option>
+      <option value="RECIBIDA">Recibida</option>
+      <option value="PROCESANDO_IA">Procesando IA</option>
+      <option value="EN_VERIFICACION">En verificación</option>
+      <option value="REQUIERE_CORRECCION">Requiere corrección</option>
+      <option value="TRANSCRITA">Transcrita</option>
+      <option value="COBRADA">Cobrada</option>
+      <option value="RECHAZADA">Rechazada</option>
+      <option value="PAGADA">Pagada</option>
+      <option value="ARCHIVADA">Archivada</option>
+    </select>
+    <select id="filterTipo" onchange="loadIncapacidades()">
+      <option value="">Todos los tipos</option>
+      <option value="ENFERMEDAD_COMUN">Enfermedad común</option>
+      <option value="ACCIDENTE_LABORAL">Accidente laboral</option>
+      <option value="LICENCIA_MATERNIDAD">Licencia maternidad</option>
+      <option value="LICENCIA_PATERNIDAD">Licencia paternidad</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Colaborador</th><th>Tipo</th><th>Estado</th>
+          <th>Entidad</th><th>Días</th><th>Fecha</th>
+        </tr></thead>
+        <tbody id="incTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUDITORIA SECTION ===== -->
+<div class="section" id="section-auditoria">
+  <div class="page-header"><h1>Log de Auditoría</h1></div>
+  <div class="card">
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Fecha/Hora</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Estado anterior</th><th>Estado nuevo</th></tr></thead>
+        <tbody id="auditTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="uploadModal">
+<div class="modal">
+  <div class="modal-header">
+    <h2>Nueva incapacidad</h2>
+    <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Tipo de incapacidad</label>
+      <select id="uploadTipo">
+        <option value="ENFERMEDAD_COMUN">Enfermedad común</option>
+        <option value="ACCIDENTE_LABORAL">Accidente laboral</option>
+        <option value="ENFERMEDAD_LABORAL">Enfermedad laboral</option>
+        <option value="LICENCIA_MATERNIDAD">Licencia de maternidad</option>
+        <option value="LICENCIA_PATERNIDAD">Licencia de paternidad</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Documento de incapacidad</label>
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="handleDrop(event)">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="4" width="24" height="32" rx="3" stroke="#94A3B8" stroke-width="2"/><path d="M15 20l5-5 5 5M20 15v12" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p>Arrastra un archivo o haz clic para seleccionar</p>
+        <div class="formats">PDF, JPG, PNG — Máximo 5 MB</div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(this)">
+      <div id="filePreview" style="display:none"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-outline" onclick="closeUploadModal()">Cancelar</button>
+    <button class="btn btn-primary" id="uploadBtn" onclick="submitIncapacidad()" disabled>
+      Cargar y procesar
+    </button>
+  </div>
+</div>
+</div>
+
+<!-- Detail Panel -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div>
+      <h2 id="detailTitle" style="font-size:1.1rem;font-weight:700;color:var(--slate-900)">Detalle</h2>
+      <div id="detailBadge" style="margin-top:6px"></div>
+    </div>
+    <button class="modal-close" onclick="closeDetail()">&times;</button>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ STATE ============
+const USER = JSON.parse('{{ user | tojson | safe }}');
+let selectedFile = null;
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('userName').textContent = `${USER.nombre} ${USER.apellido}`;
+  document.getElementById('userRole').textContent = formatRole(USER.rol);
+  document.getElementById('userAvatar').textContent = USER.nombre[0] + USER.apellido[0];
+  if (['COORDINADOR_RRHH','AUXILIAR_RRHH'].includes(USER.rol)) {
+    document.getElementById('nav-admin').style.display = 'block';
+  }
+  loadDashboard();
+  loadIncapacidades();
+});
+
+// ============ NAVIGATION ============
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`section-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'auditoria') loadAuditoria();
+  if (name === 'incapacidades') loadIncapacidades();
+  if (name === 'overview') loadDashboard();
+}
+
+// ============ API HELPERS ============
+async function api(url, options = {}) {
+  const res = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers }});
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard() {
+  try {
+    const stats = await api('/api/dashboard/stats');
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statVerificacion').textContent = stats.por_estado?.EN_VERIFICACION || 0;
+    document.getElementById('statAlertas').textContent = stats.alertas_activas;
+    document.getElementById('statRojas').textContent = stats.alertas_rojas;
+
+    // Estado chart
+    const chartEl = document.getElementById('estadoChart');
+    chartEl.innerHTML = '';
+    for (const [estado, count] of Object.entries(stats.por_estado || {})) {
+      chartEl.innerHTML += `<div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--slate-50);border-radius:8px;font-size:.82rem">
+        <span class="badge badge-${estadoClass(estado)}">${formatEstado(estado)}</span>
+        <strong>${count}</strong></div>`;
+    }
+
+    // Recent activity
+    const actEl = document.getElementById('recentActivity');
+    actEl.innerHTML = '';
+    for (const a of (stats.auditoria_reciente || []).slice(0, 8)) {
+      const time = new Date(a.fecha_hora).toLocaleString('es-CO', {dateStyle:'short',timeStyle:'short'});
+      actEl.innerHTML += `<li><strong>${a.usuario_nombre || 'Sistema'}</strong> — ${a.accion}
+        ${a.estado_nuevo ? `→ <span class="badge badge-${estadoClass(a.estado_nuevo)}">${formatEstado(a.estado_nuevo)}</span>` : ''}
+        <span class="time">${time}</span></li>`;
+    }
+    if (!stats.auditoria_reciente?.length) actEl.innerHTML = '<li>Sin actividad reciente</li>';
+  } catch(e) { console.error(e); }
+}
+
+// ============ INCAPACIDADES ============
+async function loadIncapacidades() {
+  try {
+    const estado = document.getElementById('filterEstado')?.value || '';
+    const tipo = document.getElementById('filterTipo')?.value || '';
+    let url = '/api/incapacidades?';
+    if (estado) url += `estado=${estado}&`;
+    if (tipo) url += `tipo=${tipo}&`;
+
+    const data = await api(url);
+    const tbody = document.getElementById('incTable');
+
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--slate-400)">
+        No hay incapacidades registradas. Haga clic en "Nueva incapacidad" para comenzar.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(inc => `
+      <tr onclick="openDetail('${inc.id}')" ${inc.doc_sospechoso ? 'style="background:#FFF7ED"' : ''}>
+        <td style="font-family:monospace;font-size:.75rem;color:var(--slate-400)">${inc.id.slice(0,8)}…</td>
+        <td><strong>${inc.colaborador_nombre || '—'}</strong><br><span style="font-size:.75rem;color:var(--slate-400)">${inc.cedula || ''}</span></td>
+        <td>${formatTipo(inc.tipo)}</td>
+        <td>
+          <span class="badge badge-${estadoClass(inc.estado)}">${formatEstado(inc.estado)}</span>
+          ${inc.doc_sospechoso ? '<span title="Documento sospechoso — verificar" style="margin-left:6px;font-size:.85rem;cursor:help">⚠️</span>' : ''}
+        </td>
+        <td>${inc.entidad_nombre || '—'}</td>
+        <td>${inc.dias_incapacidad || '—'}</td>
+        <td style="font-size:.8rem;color:var(--slate-500)">${new Date(inc.created_at).toLocaleDateString('es-CO')}</td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ============ DETAIL PANEL ============
+async function openDetail(id) {
+  try {
+    const data = await api(`/api/incapacidades/${id}`);
+    const inc = data.incapacidad;
+    const panel = document.getElementById('detailPanel');
+    document.getElementById('detailTitle').textContent = `Incapacidad ${inc.id.slice(0,8)}…`;
+    document.getElementById('detailBadge').innerHTML = `<span class="badge badge-${estadoClass(inc.estado)}">${formatEstado(inc.estado)}</span>`;
+
+    let html = `
+    <div class="detail-section">
+      <h3>Información general</h3>
+      <div class="detail-field"><span class="label">Colaborador</span><span class="value">${inc.colaborador_nombre || '—'}</span></div>
+      <div class="detail-field"><span class="label">Cédula</span><span class="value">${inc.cedula || '—'}</span></div>
+      <div class="detail-field"><span class="label">Cargo</span><span class="value">${inc.cargo || '—'}</span></div>
+      <div class="detail-field"><span class="label">Tipo</span><span class="value">${formatTipo(inc.tipo)}</span></div>
+      <div class="detail-field"><span class="label">Origen</span><span class="value">${inc.origen}</span></div>
+      <div class="detail-field"><span class="label">Días</span><span class="value">${inc.dias_incapacidad || '—'}</span></div>
+      <div class="detail-field"><span class="label">Diagnóstico</span><span class="value">${inc.diagnostico_cie10 || '—'}</span></div>
+      <div class="detail-field"><span class="label">Fecha inicio</span><span class="value">${inc.fecha_inicio || '—'}</span></div>
+      <div class="detail-field"><span class="label">Fecha fin</span><span class="value">${inc.fecha_fin || '—'}</span></div>
+      <div class="detail-field"><span class="label">Entidad</span><span class="value">${inc.entidad_nombre || '—'}</span></div>
+      <div class="detail-field"><span class="label">Plazo máximo</span><span class="value">${inc.plazo_max_dias || '—'} días</span></div>
+      <div class="detail-field"><span class="label">Vencimiento</span><span class="value">${inc.fecha_vencimiento_plazo || '—'}</span></div>
+    </div>`;
+
+    // Fraud / suspicious document warning banner
+    const suspiciousDocs = data.documentos.filter(doc => {
+      const campos = doc.campos_extraidos ? JSON.parse(doc.campos_extraidos) : {};
+      return doc.clasificacion_ia === 'OTRO' || doc.confianza_ia < 0.70 || doc.precision_ocr === 0;
+    });
+    if (suspiciousDocs.length) {
+      const reasons = [];
+      for (const doc of suspiciousDocs) {
+        const campos = doc.campos_extraidos ? JSON.parse(doc.campos_extraidos) : {};
+        if (doc.clasificacion_ia === 'OTRO')
+          reasons.push(`"${doc.nombre_original}" no fue reconocido como certificado médico de incapacidad — la IA lo clasificó como documento de otro tipo.`);
+        else if (doc.confianza_ia < 0.70)
+          reasons.push(`"${doc.nombre_original}" tiene baja confianza de clasificación (${(doc.confianza_ia * 100).toFixed(0)}%) — el contenido no coincide claramente con un certificado de incapacidad.`);
+        if (doc.precision_ocr === 0)
+          reasons.push(`No fue posible extraer texto de "${doc.nombre_original}" — puede ser una imagen escaneada, estar corrupto o ser ilegible.`);
+        if (Object.keys(campos).length === 0 && doc.precision_ocr > 0)
+          reasons.push(`No se encontraron campos médicos estructurados (diagnóstico, fechas, días) en "${doc.nombre_original}".`);
+      }
+      html += `
+      <div class="doc-warning">
+        <div class="doc-warning-header">
+          <div class="doc-warning-icon">⚠️</div>
+          <div>
+            <div class="doc-warning-title">Posible documento no válido o falso</div>
+            <div class="doc-warning-subtitle">El análisis automático detectó inconsistencias. Revise antes de aprobar.</div>
+          </div>
+        </div>
+        <ul class="doc-warning-reasons">
+          ${reasons.map(r => `<li>${r}</li>`).join('')}
+        </ul>
+        <div class="doc-warning-actions">Recomendación: solicite corrección o contacte al colaborador para documentación adicional.</div>
+      </div>`;
+    }
+
+    // Documents with OCR/AI data
+    if (data.documentos.length) {
+      html += `<div class="detail-section"><h3>Documentos y procesamiento IA</h3>`;
+      for (const doc of data.documentos) {
+        const campos = doc.campos_extraidos ? JSON.parse(doc.campos_extraidos) : {};
+        const isSuspicious = doc.clasificacion_ia === 'OTRO' || doc.confianza_ia < 0.70 || doc.precision_ocr === 0;
+        html += `
+        <div style="background:${isSuspicious ? '#FFF7ED' : 'var(--slate-50)'};border:1px solid ${isSuspicious ? '#F97316' : 'var(--slate-200)'};border-radius:10px;padding:16px;margin-bottom:12px">
+          <div class="detail-field"><span class="label">Archivo</span><span class="value">${doc.nombre_original}</span></div>
+          <div class="detail-field"><span class="label">Clasificación IA</span><span class="value" style="${doc.clasificacion_ia === 'OTRO' ? 'color:#C2410C;font-weight:700' : ''}">${doc.clasificacion_ia || '—'}</span></div>
+          <div class="detail-field"><span class="label">Confianza IA</span><span class="value" style="${doc.confianza_ia < 0.70 ? 'color:#C2410C;font-weight:700' : ''}">${doc.confianza_ia ? (doc.confianza_ia * 100).toFixed(0) + '%' : '—'}</span></div>
+          <div class="detail-field"><span class="label">Precisión OCR</span><span class="value" style="${doc.precision_ocr === 0 ? 'color:#C2410C;font-weight:700' : ''}">${doc.precision_ocr ? (doc.precision_ocr * 100).toFixed(0) + '%' : 'Sin extracción'}</span></div>
+          ${Object.keys(campos).length ? `<div style="margin-top:10px"><strong style="font-size:.75rem;color:var(--slate-500)">CAMPOS EXTRAÍDOS:</strong>
+            ${Object.entries(campos).map(([k,v]) => `<div class="detail-field"><span class="label">${k}</span><span class="value">${v}</span></div>`).join('')}
+          </div>` : '<div style="margin-top:8px;font-size:.78rem;color:#C2410C">⚠ Ningún campo médico pudo ser extraído.</div>'}
+          ${doc.texto_ocr ? `<div style="margin-top:10px"><strong style="font-size:.75rem;color:var(--slate-500)">TEXTO EXTRAÍDO:</strong><div class="ocr-preview">${doc.texto_ocr}</div></div>` : ''}
+        </div>`;
+      }
+      html += `</div>`;
+    }
+
+    // State actions (for RRHH roles)
+    if (['AUXILIAR_RRHH','COORDINADOR_RRHH'].includes(USER.rol)) {
+      const transitions = getTransitions(inc.estado);
+      if (transitions.length) {
+        html += `<div class="detail-section"><h3>Cambiar estado</h3><div class="state-actions">
+          ${transitions.map(t => `<button class="btn btn-sm ${t.class}" onclick="changeState('${inc.id}','${t.estado}')">${t.label}</button>`).join('')}
+        </div></div>`;
+      }
+    }
+
+    // Alerts
+    if (data.alertas.length) {
+      html += `<div class="detail-section"><h3>Alertas de vencimiento</h3>`;
+      for (const a of data.alertas) {
+        html += `<div class="detail-field">
+          <span class="label"><span class="semaforo semaforo-${a.nivel_semaforo?.toLowerCase() || 'verde'}"></span> ${a.tipo_alerta}</span>
+          <span class="value">${a.fecha_programada} (${a.dias_restantes}d)</span>
+        </div>`;
+      }
+      html += `</div>`;
+    }
+
+    // Audit trail
+    if (data.auditoria.length) {
+      html += `<div class="detail-section"><h3>Historial de auditoría</h3><ul class="timeline">`;
+      for (const a of data.auditoria) {
+        const time = new Date(a.fecha_hora).toLocaleString('es-CO', {dateStyle:'short',timeStyle:'short'});
+        html += `<li><strong>${a.usuario_nombre || 'Sistema'}</strong> — ${a.accion}
+          ${a.estado_nuevo ? ` → ${a.estado_nuevo}` : ''}
+          ${a.detalle ? `<br><span style="font-size:.72rem;color:var(--slate-400)">${a.detalle}</span>` : ''}
+          <span class="time">${time}</span></li>`;
+      }
+      html += `</ul></div>`;
+    }
+
+    document.getElementById('detailBody').innerHTML = html;
+    panel.classList.add('open');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); }
+
+function getTransitions(estado) {
+  const map = {
+    'EN_VERIFICACION': [
+      {estado:'TRANSCRITA', label:'✓ Aprobar → Transcrita', class:'btn-primary'},
+      {estado:'REQUIERE_CORRECCION', label:'✕ Solicitar corrección', class:'btn-danger'}
+    ],
+    'REQUIERE_CORRECCION': [{estado:'RECIBIDA', label:'↻ Reabrir', class:'btn-outline'}],
+    'TRANSCRITA': [{estado:'COBRADA', label:'→ Marcar como cobrada', class:'btn-primary'}],
+    'COBRADA': [
+      {estado:'PAGADA', label:'$ Registrar pago', class:'btn-primary'},
+      {estado:'RECHAZADA', label:'✕ Rechazada por EPS', class:'btn-danger'}
+    ],
+    'RECHAZADA': [
+      {estado:'TRANSCRITA', label:'↻ Corregir y reenviar', class:'btn-outline'},
+      {estado:'COBRO_JURIDICO', label:'⚖ Escalar a jurídico', class:'btn-danger'}
+    ],
+    'COBRO_JURIDICO': [{estado:'PAGADA', label:'$ Pago obtenido', class:'btn-primary'}],
+    'PAGADA': [{estado:'ARCHIVADA', label:'📁 Archivar', class:'btn-outline'}],
+  };
+  return map[estado] || [];
+}
+
+async function changeState(id, nuevoEstado) {
+  const motivo = prompt('Motivo del cambio (opcional):') || '';
+  try {
+    await api(`/api/incapacidades/${id}/estado`, {
+      method: 'PATCH',
+      body: JSON.stringify({estado: nuevoEstado, motivo})
+    });
+    toast(`Estado actualizado → ${formatEstado(nuevoEstado)}`);
+    openDetail(id);
+    loadIncapacidades();
+    loadDashboard();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ============ FILE UPLOAD ============
+function openUploadModal() { document.getElementById('uploadModal').classList.add('active'); }
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.remove('active');
+  resetUpload();
+}
+
+function handleFileSelect(input) {
+  if (input.files.length) setFile(input.files[0]);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadArea').classList.remove('dragover');
+  if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
+}
+
+function setFile(file) {
+  const allowed = ['application/pdf','image/jpeg','image/png','image/jpg'];
+  if (!allowed.includes(file.type)) { toast('Formato no válido. Use PDF, JPG o PNG.', 'error'); return; }
+  if (file.size > 5*1024*1024) { toast('El archivo supera 5 MB.', 'error'); return; }
+  selectedFile = file;
+  const sizeKB = (file.size / 1024).toFixed(0);
+  document.getElementById('filePreview').style.display = 'block';
+  document.getElementById('filePreview').innerHTML = `
+    <div class="file-selected">
+      <span class="file-name">${file.name}</span>
+      <span class="file-size">${sizeKB} KB</span>
+      <button class="remove-file" onclick="resetUpload()">×</button>
+    </div>`;
+  document.getElementById('uploadArea').style.display = 'none';
+  document.getElementById('uploadBtn').disabled = false;
+}
+
+function resetUpload() {
+  selectedFile = null;
+  document.getElementById('filePreview').style.display = 'none';
+  document.getElementById('uploadArea').style.display = 'block';
+  document.getElementById('uploadBtn').disabled = true;
+  document.getElementById('fileInput').value = '';
+}
+
+async function submitIncapacidad() {
+  if (!selectedFile) return;
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true; btn.textContent = 'Procesando OCR + IA...';
+
+  const formData = new FormData();
+  formData.append('archivo', selectedFile);
+  formData.append('tipo', document.getElementById('uploadTipo').value);
+
+  try {
+    const res = await fetch('/api/incapacidades', {method: 'POST', body: formData});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    closeUploadModal();
+    toast(`Incapacidad creada · OCR ${(data.ocr.precision*100).toFixed(0)}% · IA ${(data.ia.confianza*100).toFixed(0)}%`);
+    loadIncapacidades();
+    loadDashboard();
+    setTimeout(() => openDetail(data.id), 500);
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Cargar y procesar';
+  }
+}
+
+// ============ AUDITORIA ============
+async function loadAuditoria() {
+  try {
+    const data = await api('/api/auditoria?limit=50');
+    const tbody = document.getElementById('auditTable');
+    tbody.innerHTML = data.map(a => `
+      <tr>
+        <td style="font-size:.8rem">${new Date(a.fecha_hora).toLocaleString('es-CO',{dateStyle:'short',timeStyle:'short'})}</td>
+        <td>${a.usuario_nombre || 'Sistema'}</td>
+        <td>${a.accion}</td>
+        <td style="font-family:monospace;font-size:.75rem">${a.entidad}</td>
+        <td>${a.estado_anterior ? `<span class="badge badge-${estadoClass(a.estado_anterior)}">${formatEstado(a.estado_anterior)}</span>` : '—'}</td>
+        <td>${a.estado_nuevo ? `<span class="badge badge-${estadoClass(a.estado_nuevo)}">${formatEstado(a.estado_nuevo)}</span>` : '—'}</td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+// ============ AUTH ============
+async function logout() {
+  await fetch('/api/auth/logout', {method:'POST'});
+  localStorage.clear();
+  window.location.href = '/login';
+}
+
+// ============ FORMAT HELPERS ============
+function formatEstado(e) {
+  const m = {RECIBIDA:'Recibida',PROCESANDO_IA:'Procesando IA',EN_VERIFICACION:'En verificación',
+    REQUIERE_CORRECCION:'Requiere corrección',TRANSCRITA:'Transcrita',COBRADA:'Cobrada',
+    RECHAZADA:'Rechazada',COBRO_JURIDICO:'Cobro jurídico',PAGADA:'Pagada',ARCHIVADA:'Archivada',VENCIDA:'Vencida'};
+  return m[e] || e;
+}
+function estadoClass(e) {
+  const m = {RECIBIDA:'recibida',PROCESANDO_IA:'procesando',EN_VERIFICACION:'verificacion',
+    REQUIERE_CORRECCION:'correccion',TRANSCRITA:'transcrita',COBRADA:'cobrada',
+    RECHAZADA:'rechazada',COBRO_JURIDICO:'juridico',PAGADA:'pagada',ARCHIVADA:'archivada',VENCIDA:'vencida'};
+  return m[e] || 'recibida';
+}
+function formatTipo(t) {
+  const m = {ENFERMEDAD_COMUN:'Enfermedad común',ACCIDENTE_LABORAL:'Accidente laboral',
+    ENFERMEDAD_LABORAL:'Enfermedad laboral',LICENCIA_MATERNIDAD:'Licencia maternidad',
+    LICENCIA_PATERNIDAD:'Licencia paternidad'};
+  return m[t] || t;
+}
+function formatRole(r) {
+  const m = {COLABORADOR:'Colaborador',RECEPCION:'Recepción',AUXILIAR_RRHH:'Auxiliar RRHH',
+    COORDINADOR_RRHH:'Coordinador RRHH',CONTABILIDAD:'Contabilidad'};
+  return m[r] || r;
+}
+</script>
+</body>
+</html>

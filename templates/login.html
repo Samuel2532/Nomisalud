@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomisalud — Iniciar Sesión</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--teal-700:#047857;--teal-600:#059669;--teal-500:#10B981;--teal-100:#D1FAE5;--teal-50:#ECFDF5;--coral-500:#EF7654;--coral-100:#FEF0E7;--slate-900:#0F172A;--slate-700:#334155;--slate-500:#64748B;--slate-300:#CBD5E1;--slate-200:#E2E8F0;--slate-100:#F1F5F9;--slate-50:#F8FAFC;--white:#FFF;--red-500:#EF4444;--red-100:#FEE2E2}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(150deg,var(--teal-50),var(--white) 50%,var(--coral-100));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-container{width:100%;max-width:420px}
+.login-logo{text-align:center;margin-bottom:36px}
+.login-logo svg{width:48px;height:48px;margin-bottom:12px}
+.login-logo h1{font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--slate-900);letter-spacing:-1px}
+.login-logo p{font-size:.9rem;color:var(--slate-500);margin-top:4px;font-weight:300}
+.login-card{background:var(--white);border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--slate-700);margin-bottom:6px;letter-spacing:.3px}
+.form-group input{width:100%;padding:12px 16px;border:1.5px solid var(--slate-200);border-radius:12px;font-size:.95rem;font-family:inherit;transition:all .2s;background:var(--slate-50);color:var(--slate-900)}
+.form-group input:focus{outline:none;border-color:var(--teal-500);background:var(--white);box-shadow:0 0 0 3px rgba(16,185,129,.1)}
+.login-btn{width:100%;padding:14px;background:var(--teal-700);color:var(--white);border:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s;margin-top:8px}
+.login-btn:hover{background:#065F46;transform:translateY(-1px);box-shadow:0 4px 16px rgba(5,150,105,.3)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.error-msg{background:var(--red-100);color:var(--red-500);padding:10px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none;font-weight:500}
+.demo-accounts{margin-top:24px;padding-top:20px;border-top:1px solid var(--slate-200)}
+.demo-accounts h4{font-size:.75rem;font-weight:700;color:var(--slate-500);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.demo-btn{width:100%;padding:10px 14px;border:1.5px solid var(--slate-200);border-radius:10px;background:var(--white);cursor:pointer;font-family:inherit;font-size:.82rem;text-align:left;transition:all .2s;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;color:var(--slate-700)}
+.demo-btn:hover{border-color:var(--teal-400);background:var(--teal-50)}
+.demo-btn .role{font-size:.7rem;font-weight:600;color:var(--teal-700);background:var(--teal-100);padding:2px 8px;border-radius:100px}
+</style>
+</head>
+<body>
+<div class="login-container">
+  <div class="login-logo">
+    <svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#065F46"/><path d="M12 24C12 17.37 17.37 12 24 12C30.63 12 36 17.37 36 24" stroke="#34D399" stroke-width="3" stroke-linecap="round"/><path d="M18 30V22.5L24 18L30 22.5V30" stroke="#A7F3D0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="25.5" r="3" fill="#6EE7B7"/></svg>
+    <h1>Nomisalud</h1>
+    <p>Sistema de Gestión de Incapacidades</p>
+  </div>
+  <div class="login-card">
+    <div class="error-msg" id="error"></div>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input type="email" id="email" placeholder="usuario@nomisalud.co" required>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">Iniciar sesión</button>
+    </form>
+    <div class="demo-accounts">
+      <h4>Cuentas de demostración</h4>
+      <button class="demo-btn" onclick="fillDemo('admin@nomisalud.co','admin123')">
+        Carlos Ramírez <span class="role">Coordinador RRHH</span>
+      </button>
+      <button class="demo-btn" onclick="fillDemo('auxiliar@nomisalud.co','aux123')">
+        Laura Gómez <span class="role">Auxiliar RRHH</span>
+      </button>
+      <button class="demo-btn" onclick="fillDemo('colaborador@nomisalud.co','col123')">
+        Jean Paul Bedoya <span class="role">Colaborador</span>
+      </button>
+      <button class="demo-btn" onclick="fillDemo('contabilidad@nomisalud.co','cont123')">
+        Andrés Torres <span class="role">Contabilidad</span>
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+function fillDemo(email, pass) {
+  document.getElementById('email').value = email;
+  document.getElementById('password').value = pass;
+}
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('error');
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+  err.style.display = 'none';
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { throw new Error(data.error || 'Error de autenticación'); }
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    window.location.href = '/dashboard';
+  } catch(e) {
+    err.textContent = e.message; err.style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Iniciar sesión';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomisalud — Gestión Inteligente de Incapacidades Médicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--teal-900:#064E3B;--teal-800:#065F46;--teal-700:#047857;--teal-600:#059669;
+--teal-500:#10B981;--teal-400:#34D399;--teal-300:#6EE7B7;--teal-200:#A7F3D0;--teal-100:#D1FAE5;--teal-50:#ECFDF5;
+--coral-600:#DC5B3A;--coral-500:#EF7654;--coral-400:#F59E7B;--coral-300:#FBC4A8;--coral-100:#FEF0E7;
+--slate-900:#0F172A;--slate-800:#1E293B;--slate-700:#334155;--slate-600:#475569;--slate-500:#64748B;
+--slate-400:#94A3B8;--slate-300:#CBD5E1;--slate-200:#E2E8F0;--slate-100:#F1F5F9;--slate-50:#F8FAFC;
+--white:#FFFFFF;
+--font-display:'DM Serif Display',Georgia,serif;
+--font-body:'Plus Jakarta Sans',-apple-system,sans-serif;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-body);color:var(--slate-800);background:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ===================== NAV ===================== */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .4s ease}
+nav.scrolled{background:rgba(255,255,255,.92);backdrop-filter:blur(20px);box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:20px 40px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo svg{width:32px;height:32px}
+.nav-logo span{font-family:var(--font-display);font-size:1.35rem;color:var(--teal-800);letter-spacing:-.5px}
+.nav-links{display:flex;gap:36px;align-items:center}
+.nav-links a{text-decoration:none;font-size:.875rem;font-weight:500;color:var(--slate-600);transition:color .2s;letter-spacing:.2px}
+.nav-links a:hover{color:var(--teal-700)}
+.nav-cta{background:var(--teal-700);color:var(--white) !important;padding:10px 24px;border-radius:100px;font-weight:600 !important;transition:all .25s !important}
+.nav-cta:hover{background:var(--teal-800);transform:translateY(-1px);box-shadow:0 4px 16px rgba(5,150,105,.3)}
+
+/* ===================== HERO ===================== */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(165deg,var(--teal-50) 0%,var(--white) 40%,var(--coral-100) 100%)}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.08),transparent 70%);animation:pulse-soft 8s ease-in-out infinite}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(220,91,58,.06),transparent 70%);animation:pulse-soft 10s ease-in-out infinite 2s}
+@keyframes pulse-soft{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.hero-inner{max-width:1200px;margin:0 auto;padding:140px 40px 80px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);padding:6px 16px;border-radius:100px;font-size:.75rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .8s ease both}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal-500);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-family:var(--font-display);font-size:3.6rem;line-height:1.1;color:var(--slate-900);letter-spacing:-1.5px;margin-bottom:24px;animation:fadeUp .8s ease .1s both}
+.hero h1 em{font-style:italic;color:var(--teal-700)}
+.hero-sub{font-size:1.15rem;line-height:1.7;color:var(--slate-600);max-width:500px;margin-bottom:40px;font-weight:300;animation:fadeUp .8s ease .2s both}
+.hero-actions{display:flex;gap:16px;animation:fadeUp .8s ease .3s both}
+.btn-primary{background:var(--teal-700);color:var(--white);padding:16px 36px;border-radius:100px;text-decoration:none;font-weight:600;font-size:.95rem;transition:all .25s;display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--teal-800);transform:translateY(-2px);box-shadow:0 8px 30px rgba(5,150,105,.25)}
+.btn-secondary{background:transparent;color:var(--slate-700);padding:16px 36px;border-radius:100px;text-decoration:none;font-weight:600;font-size:.95rem;border:1.5px solid var(--slate-300);transition:all .25s;cursor:pointer}
+.btn-secondary:hover{border-color:var(--teal-400);color:var(--teal-700);background:var(--teal-50)}
+
+/* Hero visual */
+.hero-visual{position:relative;animation:fadeUp .8s ease .4s both}
+.hero-card{background:var(--white);border-radius:20px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04);position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--teal-500),var(--teal-400),var(--coral-500))}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.card-header h3{font-size:.85rem;font-weight:600;color:var(--slate-800);letter-spacing:.3px}
+.card-status{font-size:.7rem;font-weight:600;color:var(--teal-700);background:var(--teal-100);padding:4px 12px;border-radius:100px}
+.tracker-steps{display:flex;flex-direction:column;gap:0}
+.tracker-step{display:flex;align-items:flex-start;gap:16px;padding:12px 0;position:relative}
+.step-indicator{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.step-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--slate-300);background:var(--white);position:relative;z-index:2;transition:all .3s}
+.step-dot.active{border-color:var(--teal-500);background:var(--teal-500);box-shadow:0 0 0 4px rgba(16,185,129,.15)}
+.step-dot.completed{border-color:var(--teal-500);background:var(--teal-500)}
+.step-line{width:2px;height:28px;background:var(--slate-200);margin:4px 0}
+.step-line.active{background:var(--teal-400)}
+.step-content h4{font-size:.8rem;font-weight:600;color:var(--slate-800)}
+.step-content p{font-size:.7rem;color:var(--slate-500);margin-top:2px}
+.step-content .step-time{font-size:.65rem;color:var(--teal-600);font-weight:500;margin-top:3px}
+
+/* Floating elements */
+.float-badge{position:absolute;background:var(--white);border-radius:14px;padding:12px 18px;box-shadow:0 8px 30px rgba(0,0,0,.1);display:flex;align-items:center;gap:10px;font-size:.78rem;font-weight:500;animation:float 6s ease-in-out infinite}
+.float-badge.ocr{top:-15px;right:-20px;animation-delay:0s;color:var(--teal-800)}
+.float-badge.ai{bottom:40px;left:-30px;animation-delay:2s;color:var(--coral-600)}
+.float-badge svg{flex-shrink:0}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ===================== STATS BAR ===================== */
+.stats-bar{background:var(--teal-900);padding:48px 40px;position:relative;overflow:hidden}
+.stats-bar::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.stats-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;position:relative;z-index:2}
+.stat-item{text-align:center}
+.stat-number{font-family:var(--font-display);font-size:2.8rem;color:var(--teal-300);letter-spacing:-1px}
+.stat-label{font-size:.85rem;color:var(--teal-200);opacity:.8;margin-top:4px;font-weight:300}
+
+/* ===================== FEATURES ===================== */
+.features{padding:120px 40px;background:var(--white)}
+.section-header{text-align:center;max-width:700px;margin:0 auto 80px}
+.section-eyebrow{font-size:.75rem;font-weight:700;color:var(--coral-600);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.section-title{font-family:var(--font-display);font-size:2.6rem;color:var(--slate-900);letter-spacing:-1px;line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:1.05rem;color:var(--slate-500);line-height:1.7;font-weight:300}
+.features-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{padding:36px 32px;border-radius:16px;background:var(--slate-50);border:1px solid transparent;transition:all .35s ease;position:relative;overflow:hidden}
+.feature-card:hover{background:var(--white);border-color:var(--teal-200);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.06)}
+.feature-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.3rem}
+.feature-icon.teal{background:var(--teal-100);color:var(--teal-700)}
+.feature-icon.coral{background:var(--coral-100);color:var(--coral-600)}
+.feature-icon.slate{background:var(--slate-200);color:var(--slate-700)}
+.feature-card h3{font-size:1.05rem;font-weight:700;color:var(--slate-900);margin-bottom:10px;letter-spacing:-.2px}
+.feature-card p{font-size:.88rem;color:var(--slate-500);line-height:1.65;font-weight:300}
+.feature-tag{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:100px;margin-top:14px;letter-spacing:.5px;text-transform:uppercase}
+.feature-tag.alta{background:var(--teal-100);color:var(--teal-800)}
+.feature-tag.media{background:var(--coral-100);color:var(--coral-600)}
+
+/* ===================== PROCESS ===================== */
+.process{padding:120px 40px;background:var(--slate-50);position:relative}
+.process::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--slate-300),transparent)}
+.process-inner{max-width:1200px;margin:0 auto}
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:80px}
+.process-step{text-align:center;position:relative}
+.process-step::after{content:'';position:absolute;top:36px;right:-16px;width:32px;height:2px;background:var(--teal-300)}
+.process-step:last-child::after{display:none}
+.step-num{width:72px;height:72px;border-radius:50%;background:var(--white);border:2px solid var(--teal-200);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:var(--font-display);font-size:1.6rem;color:var(--teal-700);transition:all .3s}
+.process-step:hover .step-num{background:var(--teal-700);color:var(--white);border-color:var(--teal-700);transform:scale(1.1)}
+.process-step h3{font-size:.95rem;font-weight:700;color:var(--slate-800);margin-bottom:8px}
+.process-step p{font-size:.82rem;color:var(--slate-500);line-height:1.6;font-weight:300}
+
+/* ===================== COMPLIANCE ===================== */
+.compliance{padding:120px 40px;background:var(--white)}
+.compliance-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.compliance-visual{position:relative}
+.compliance-card{background:linear-gradient(135deg,var(--teal-900),var(--teal-800));border-radius:20px;padding:48px;color:var(--white);position:relative;overflow:hidden}
+.compliance-card::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,.08)}
+.compliance-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:150px;height:150px;border-radius:50%;border:1px solid rgba(255,255,255,.05)}
+.compliance-card h3{font-family:var(--font-display);font-size:1.5rem;margin-bottom:24px;position:relative;z-index:2}
+.compliance-list{list-style:none;display:flex;flex-direction:column;gap:16px;position:relative;z-index:2}
+.compliance-list li{display:flex;align-items:flex-start;gap:12px;font-size:.9rem;font-weight:300;line-height:1.5;color:var(--teal-100)}
+.compliance-list li svg{flex-shrink:0;margin-top:2px}
+.compliance-text h2{font-family:var(--font-display);font-size:2.2rem;color:var(--slate-900);letter-spacing:-.8px;margin-bottom:20px;line-height:1.2}
+.compliance-text p{font-size:1rem;color:var(--slate-500);line-height:1.7;font-weight:300;margin-bottom:24px}
+.entity-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.entity-tag{padding:8px 16px;border-radius:100px;font-size:.78rem;font-weight:600;background:var(--slate-100);color:var(--slate-700);border:1px solid var(--slate-200);transition:all .2s}
+.entity-tag:hover{background:var(--teal-50);border-color:var(--teal-300);color:var(--teal-800)}
+
+/* ===================== TECH ===================== */
+.tech{padding:100px 40px;background:var(--slate-900);color:var(--white);position:relative;overflow:hidden}
+.tech::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(16,185,129,.1),transparent 60%)}
+.tech-inner{max-width:1200px;margin:0 auto;position:relative;z-index:2}
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:60px}
+.tech-item{text-align:center;padding:32px 20px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);transition:all .3s}
+.tech-item:hover{background:rgba(255,255,255,.08);border-color:rgba(16,185,129,.3);transform:translateY(-3px)}
+.tech-item .tech-icon{font-size:2rem;margin-bottom:12px}
+.tech-item h4{font-size:.9rem;font-weight:600;color:var(--teal-300);margin-bottom:6px}
+.tech-item p{font-size:.78rem;color:var(--slate-400);font-weight:300;line-height:1.5}
+
+/* ===================== CTA ===================== */
+.cta-section{padding:120px 40px;background:var(--teal-50);position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal-300),transparent)}
+.cta-inner{max-width:700px;margin:0 auto;text-align:center}
+.cta-inner h2{font-family:var(--font-display);font-size:2.6rem;color:var(--slate-900);letter-spacing:-1px;margin-bottom:16px;line-height:1.15}
+.cta-inner p{font-size:1.05rem;color:var(--slate-500);line-height:1.7;margin-bottom:40px;font-weight:300}
+.cta-buttons{display:flex;gap:16px;justify-content:center}
+
+/* ===================== FOOTER ===================== */
+footer{background:var(--slate-900);padding:60px 40px 32px;color:var(--slate-400)}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.06)}
+.footer-brand p{font-size:.85rem;line-height:1.7;margin-top:12px;font-weight:300;max-width:280px}
+.footer-col h4{font-size:.75rem;font-weight:700;color:var(--teal-400);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.footer-col a{display:block;font-size:.85rem;color:var(--slate-400);text-decoration:none;margin-bottom:10px;font-weight:300;transition:color .2s}
+.footer-col a:hover{color:var(--teal-300)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:32px;font-size:.78rem;font-weight:300}
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:1024px){
+.hero-inner{grid-template-columns:1fr;gap:48px;padding-top:120px}
+.hero h1{font-size:2.8rem}
+.hero-visual{max-width:500px}
+.features-grid{grid-template-columns:repeat(2,1fr)}
+.process-grid{grid-template-columns:repeat(2,1fr);gap:48px}
+.process-step::after{display:none}
+.compliance-inner{grid-template-columns:1fr}
+.tech-grid{grid-template-columns:repeat(2,1fr)}
+.footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+.nav-links{display:none}
+.hero-inner{padding:100px 20px 60px}
+.hero h1{font-size:2.2rem}
+.hero-actions{flex-direction:column}
+.stats-inner{grid-template-columns:repeat(2,1fr);gap:24px}
+.features-grid,.tech-grid{grid-template-columns:1fr}
+.process-grid{grid-template-columns:1fr}
+.cta-buttons{flex-direction:column;align-items:center}
+.footer-top{grid-template-columns:1fr}
+.footer-bottom{flex-direction:column;gap:12px;text-align:center}
+section{padding:80px 20px !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav id="nav">
+<div class="nav-inner">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#065F46"/>
+      <path d="M8 16C8 11.58 11.58 8 16 8C20.42 8 24 11.58 24 16" stroke="#34D399" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M12 20V15L16 12L20 15V20" stroke="#A7F3D0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="16" cy="17" r="2" fill="#6EE7B7"/>
+    </svg>
+    <span>Nomisalud</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Características</a>
+    <a href="#process">Proceso</a>
+    <a href="#compliance">Normatividad</a>
+    <a href="#tech">Tecnología</a>
+    <a href="/login" class="nav-cta">Ingresar al sistema</a>
+  </div>
+</div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+<div class="hero-inner">
+  <div class="hero-content">
+    <div class="hero-badge">
+      Sistema activo — Colombia 2026
+    </div>
+    <h1>Gestión <em>inteligente</em> de incapacidades médicas</h1>
+    <p class="hero-sub">Centralice, automatice y digitalice el ciclo completo de incapacidades de origen común y laboral. IA + OCR para eliminar el trabajo manual y prevenir la pérdida de plazos económicos críticos.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">
+        Solicitar demostración
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#features" class="btn-secondary">Explorar funcionalidades</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="card-header">
+        <h3>Seguimiento en tiempo real</h3>
+        <span class="card-status">● En proceso</span>
+      </div>
+      <div class="tracker-steps">
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot completed"></div><div class="step-line active"></div></div>
+          <div class="step-content"><h4>Recibida</h4><p>Documento cargado exitosamente</p><span class="step-time">Hace 2 horas</span></div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot completed"></div><div class="step-line active"></div></div>
+          <div class="step-content"><h4>Procesando IA</h4><p>OCR 92% · Clasificado: Certificado</p><span class="step-time">Hace 1 hora</span></div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot active"></div><div class="step-line"></div></div>
+          <div class="step-content"><h4>En verificación</h4><p>Auxiliar RRHH revisando datos</p></div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot"></div><div class="step-line"></div></div>
+          <div class="step-content"><h4>Transcrita</h4><p>Lista para envío a EPS</p></div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot"></div><div class="step-line"></div></div>
+          <div class="step-content"><h4>Cobrada</h4><p>Enviada a entidad para pago</p></div>
+        </div>
+        <div class="tracker-step">
+          <div class="step-indicator"><div class="step-dot"></div></div>
+          <div class="step-content"><h4>Pagada</h4><p>Pago recibido y conciliado</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="float-badge ocr">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="#059669" stroke-width="1.5"/><path d="M6 8h8M6 11h5" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/></svg>
+      OCR precisión: 92%
+    </div>
+    <div class="float-badge ai">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#DC5B3A" stroke-width="1.5"/><path d="M10 7v3l2 2" stroke="#DC5B3A" stroke-width="1.5" stroke-linecap="round"/></svg>
+      IA: 5 campos extraídos
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== STATS ==================== -->
+<section class="stats-bar">
+<div class="stats-inner">
+  <div class="stat-item reveal"><div class="stat-number">70%</div><div class="stat-label">Reducción de trabajo manual</div></div>
+  <div class="stat-item reveal"><div class="stat-number">>85%</div><div class="stat-label">Precisión OCR garantizada</div></div>
+  <div class="stat-item reveal"><div class="stat-number">>90%</div><div class="stat-label">Clasificación IA de documentos</div></div>
+  <div class="stat-item reveal"><div class="stat-number">99%</div><div class="stat-label">Disponibilidad en horario laboral</div></div>
+</div>
+</section>
+
+<!-- ==================== FEATURES ==================== -->
+<section class="features" id="features">
+<div class="section-header reveal">
+  <div class="section-eyebrow">Características del sistema</div>
+  <h2 class="section-title">Todo lo que necesita para gestionar incapacidades sin perder un solo plazo</h2>
+  <p class="section-desc">10 características diseñadas para transformar un proceso manual y desarticulado en un flujo digital inteligente y trazable.</p>
+</div>
+<div class="features-grid">
+  <div class="feature-card reveal">
+    <div class="feature-icon teal">📄</div>
+    <h3>Portal de carga inteligente</h3>
+    <p>Reciba documentos en PDF, JPG y PNG (máx. 5 MB) con confirmación automática por correo y almacenamiento seguro AES-256.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon coral">🔍</div>
+    <h3>OCR automático con Tesseract</h3>
+    <p>Extracción de texto con precisión superior al 85%, incluso en documentos escaneados o fotografiados con pre-procesamiento de imagen.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon teal">🤖</div>
+    <h3>Clasificación IA &gt;90%</h3>
+    <p>Inteligencia artificial clasifica automáticamente 5 tipos de documentos: certificado, epicrisis, FURIPS, nacido vivo y registro civil.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon coral">✅</div>
+    <h3>Validación inteligente</h3>
+    <p>Detección automática de inconsistencias: género vs. tipo de incapacidad, fechas ilógicas, documentación faltante según tipo.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon teal">📊</div>
+    <h3>Seguimiento en tiempo real</h3>
+    <p>7 estados con historial completo: Recibida, Procesando IA, En Verificación, Transcrita, Cobrada, Rechazada, Pagada. Semáforo visual incluido.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon coral">⏰</div>
+    <h3>Alertas diferenciadas por entidad</h3>
+    <p>Cada EPS/ARL tiene plazos distintos. Nomisalud programa alertas con 7 días de anticipación y semáforo verde/amarillo/rojo.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon slate">📈</div>
+    <h3>Dashboard RRHH</h3>
+    <p>Filtros por estado, entidad, tipo y fechas. Búsqueda rápida, KPIs de efectividad y exportación directa a Excel.</p>
+    <span class="feature-tag media">Prioridad media</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon slate">💰</div>
+    <h3>Gestión financiera</h3>
+    <p>Registro de pagos, conciliación mensual automatizada entre incapacidades cobradas y pagadas, alertas de pagos retrasados.</p>
+    <span class="feature-tag media">Prioridad media</span>
+  </div>
+  <div class="feature-card reveal">
+    <div class="feature-icon teal">🔐</div>
+    <h3>5 roles diferenciados</h3>
+    <p>Colaborador, Recepción, Auxiliar RRHH, Coordinador RRHH y Contabilidad. Permisos granulares y auditoría completa de accesos.</p>
+    <span class="feature-tag alta">Prioridad alta</span>
+  </div>
+</div>
+</section>
+
+<!-- ==================== PROCESS ==================== -->
+<section class="process" id="process">
+<div class="process-inner">
+  <div class="section-header reveal">
+    <div class="section-eyebrow">Cómo funciona</div>
+    <h2 class="section-title">De documento físico a trámite digital en minutos</h2>
+    <p class="section-desc">Elimine las 16 actividades manuales del procedimiento actual con un flujo automatizado de 4 pasos.</p>
+  </div>
+  <div class="process-grid">
+    <div class="process-step reveal">
+      <div class="step-num">1</div>
+      <h3>Cargar documento</h3>
+      <p>El colaborador o recepción sube el documento (PDF, JPG, PNG). El sistema confirma la recepción por correo electrónico.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">2</div>
+      <h3>OCR + IA procesa</h3>
+      <p>Tesseract extrae el texto. La IA clasifica el documento y extrae automáticamente nombre, cédula, días, fechas, diagnóstico y entidad.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">3</div>
+      <h3>Verificar y transcribir</h3>
+      <p>Auxiliar RRHH verifica los datos extraídos contra el documento original. Si todo está correcto, se transcribe ante la EPS/ARL.</p>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">4</div>
+      <h3>Cobrar y conciliar</h3>
+      <p>El sistema monitorea el pago, alerta vencimientos y facilita la conciliación mensual con contabilidad.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== COMPLIANCE ==================== -->
+<section class="compliance" id="compliance">
+<div class="compliance-inner">
+  <div class="compliance-visual reveal">
+    <div class="compliance-card">
+      <h3>Cumplimiento normativo incorporado</h3>
+      <ul class="compliance-list">
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Resolución 1843 de 2025 — Mintrabajo
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Ley de Habeas Data — Protección de datos médicos
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Evaluaciones post-incapacidad a los 30 y 90 días
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Concepto de rehabilitación antes del día 120
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Encriptación AES-256 + HTTPS TLS 1.2+
+        </li>
+        <li>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#34D399" stroke-width="1.5"/><path d="M5.5 9.5L7.5 11.5L12.5 6.5" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Auditoría completa de accesos y cambios
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="compliance-text reveal">
+    <h2>Diseñado desde cero para la normatividad colombiana</h2>
+    <p>No es una adaptación: Nomisalud fue concebido específicamente para cumplir la Resolución 1843/2025 del Mintrabajo y la Ley de Habeas Data. Cada flujo, alerta y validación responde a un requisito normativo real.</p>
+    <p>Los plazos de cada EPS y ARL están parametrizados individualmente, porque sabemos que no es lo mismo gestionar una incapacidad con SURA (150 días) que con Sanitas (3 años).</p>
+    <div class="entity-tags">
+      <span class="entity-tag">Salud Total</span>
+      <span class="entity-tag">Nueva EPS</span>
+      <span class="entity-tag">SOS</span>
+      <span class="entity-tag">Sanitas</span>
+      <span class="entity-tag">SURA EPS</span>
+      <span class="entity-tag">Asmet Salud</span>
+      <span class="entity-tag">ARL SURA</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== TECH STACK ==================== -->
+<section class="tech" id="tech">
+<div class="tech-inner">
+  <div class="section-header">
+    <div class="section-eyebrow" style="color:var(--teal-400)">Stack tecnológico</div>
+    <h2 class="section-title" style="color:var(--white)">Construido con tecnologías probadas en producción</h2>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-item reveal">
+      <div class="tech-icon">⚡</div>
+      <h4>FastAPI</h4>
+      <p>Python 3.11 · API REST de alto rendimiento con documentación Swagger automática</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">⚛️</div>
+      <h4>React.js 18</h4>
+      <p>Interfaz responsive con TailwindCSS y gráficas Recharts para el dashboard</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🐘</div>
+      <h4>PostgreSQL 14+</h4>
+      <p>Base de datos relacional robusta con JSONB para campos extraídos y auditoría</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🔬</div>
+      <h4>Tesseract.js + Claude</h4>
+      <p>OCR &gt;85% + IA clasificación &gt;90% para los 5 tipos de documento</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🔒</div>
+      <h4>AES-256 + JWT</h4>
+      <p>Encriptación de datos médicos, autenticación por tokens y 5 roles granulares</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">📬</div>
+      <h4>SMTP + WebSocket</h4>
+      <p>Notificaciones por correo con Nodemailer y actualizaciones de estado en tiempo real</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">🧪</div>
+      <h4>Jest + Supertest</h4>
+      <p>Cobertura de pruebas superior al 80% con tests unitarios y de integración</p>
+    </div>
+    <div class="tech-item reveal">
+      <div class="tech-icon">📦</div>
+      <h4>Git + CI/CD</h4>
+      <p>Control de versiones con GitHub, documentación completa y despliegue automatizado</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ==================== CTA ==================== -->
+<section class="cta-section" id="contact">
+<div class="cta-inner reveal">
+  <h2>Transforme la gestión de incapacidades de su empresa</h2>
+  <p>Deje de perder dinero por plazos vencidos y errores manuales. Nomisalud automatiza el 70% del trabajo y garantiza que cada peso que le deben las EPS y ARL llegue a su empresa.</p>
+  <div class="cta-buttons">
+    <a href="mailto:contacto@nomisalud.co" class="btn-primary">
+      Solicitar demostración gratuita
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10m0 0L9 4m4 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#features" class="btn-secondary">Ver características</a>
+  </div>
+</div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+<div class="footer-inner">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 32 32" fill="none" width="32" height="32"><rect width="32" height="32" rx="8" fill="#065F46"/><path d="M8 16C8 11.58 11.58 8 16 8C20.42 8 24 11.58 24 16" stroke="#34D399" stroke-width="2.5" stroke-linecap="round"/><path d="M12 20V15L16 12L20 15V20" stroke="#A7F3D0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="17" r="2" fill="#6EE7B7"/></svg>
+        <span>Nomisalud</span>
+      </a>
+      <p>Sistema web inteligente para la gestión centralizada de incapacidades médicas de origen común y laboral.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Producto</h4>
+      <a href="#features">Características</a>
+      <a href="#process">Cómo funciona</a>
+      <a href="#tech">Tecnología</a>
+      <a href="#">Precios</a>
+    </div>
+    <div class="footer-col">
+      <h4>Normatividad</h4>
+      <a href="#compliance">Res. 1843/2025</a>
+      <a href="#">Ley Habeas Data</a>
+      <a href="#">Seguridad</a>
+      <a href="#">Auditoría</a>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <a href="#">Sobre nosotros</a>
+      <a href="mailto:contacto@nomisalud.co">Contacto</a>
+      <a href="#">Blog</a>
+      <a href="#">Soporte</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Nomisalud. Todos los derechos reservados.</span>
+    <span>Ingeniería de Software I · Pereira, Colombia</span>
+  </div>
+</div>
+</footer>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Animate tracker steps sequentially
+const steps = document.querySelectorAll('.tracker-step');
+steps.forEach((step, i) => {
+  step.style.opacity = '0';
+  step.style.transform = 'translateX(-10px)';
+  setTimeout(() => {
+    step.style.transition = 'all .5s ease';
+    step.style.opacity = '1';
+    step.style.transform = 'translateX(0)';
+  }, 800 + i * 200);
+});
+</script>
+</body>
+</html>

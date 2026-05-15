@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+nomisalud.db
+static/uploads/*
+!static/uploads/.gitkeep
+static/ejemplos/*
+.DS_Store
+.vercel
