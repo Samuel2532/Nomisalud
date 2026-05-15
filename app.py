@@ -48,13 +48,19 @@ def generate_token(user):
 
 
 def get_current_user():
-    """Get user from session."""
+    """Get user from session, with fallback to session-cached data for serverless environments."""
     if "user_id" not in session:
         return None
     db = get_db()
     user = db.execute("SELECT * FROM usuarios WHERE id=?", (session["user_id"],)).fetchone()
     db.close()
-    return user
+    if user:
+        return user
+    # On Vercel, a new function instance may have a freshly seeded DB that doesn't yet
+    # have the user from a previous instance's login. Fall back to session-cached fields.
+    if "user_cache" in session:
+        return session["user_cache"]
+    return None
 
 
 def login_required(f):
@@ -376,6 +382,13 @@ def api_login():
     session["user_id"] = user["id"]
     session["user_rol"] = user["rol"]
     session["user_nombre"] = f"{user['nombre']} {user['apellido']}"
+    # Cache essential user fields in the session so serverless instances without
+    # a populated DB can still authenticate subsequent requests.
+    session["user_cache"] = {
+        "id": user["id"], "nombre": user["nombre"], "apellido": user["apellido"],
+        "email": user["email"], "rol": user["rol"], "activo": 1,
+        "password_hash": "", "fecha_creacion": "", "ultimo_acceso": "",
+    }
 
     token = generate_token(user)
     db.close()
