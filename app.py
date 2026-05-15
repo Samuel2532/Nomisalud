@@ -93,22 +93,16 @@ def extract_text_from_file(filepath):
 
     if ext == "pdf":
         try:
-            import pdfplumber
-            text_parts = []
-            with pdfplumber.open(filepath) as pdf:
-                for page in pdf.pages:
-                    page_text = page.extract_text()
-                    if page_text:
-                        text_parts.append(page_text)
-            extracted = "\n".join(text_parts).strip()
+            from pdfminer.high_level import extract_text as _pdf_extract
+            extracted = _pdf_extract(filepath) or ""
+            extracted = extracted.strip()
             if extracted:
-                # Precision is high for digital PDFs since no OCR is involved
                 return extracted, 0.97
             return "", 0.0
         except Exception:
             return "", 0.0
 
-    # For images (jpg/png): Pillow can't do OCR — return empty so it routes to REQUIERE_CORRECCION
+    # For images (jpg/png): no OCR available without an external binary — route to REQUIERE_CORRECCION
     return "", 0.0
 
 
