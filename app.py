@@ -21,8 +21,7 @@ from models import get_db, init_db, log_audit
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "nomisalud-dev-secret-key-2026")
-_IS_VERCEL = os.environ.get("VERCEL") == "1"
-app.config["UPLOAD_FOLDER"] = "/tmp/uploads" if _IS_VERCEL else os.path.join(os.path.dirname(__file__), "static", "uploads")
+app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "static", "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5 MB
 
 ALLOWED_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
@@ -48,19 +47,13 @@ def generate_token(user):
 
 
 def get_current_user():
-    """Get user from session, with fallback to session-cached data for serverless environments."""
+    """Get user from session."""
     if "user_id" not in session:
         return None
     db = get_db()
     user = db.execute("SELECT * FROM usuarios WHERE id=?", (session["user_id"],)).fetchone()
     db.close()
-    if user:
-        return user
-    # On Vercel, a new function instance may have a freshly seeded DB that doesn't yet
-    # have the user from a previous instance's login. Fall back to session-cached fields.
-    if "user_cache" in session:
-        return session["user_cache"]
-    return None
+    return user
 
 
 def login_required(f):
@@ -376,13 +369,6 @@ def api_login():
     session["user_id"] = user["id"]
     session["user_rol"] = user["rol"]
     session["user_nombre"] = f"{user['nombre']} {user['apellido']}"
-    # Cache essential user fields in the session so serverless instances without
-    # a populated DB can still authenticate subsequent requests.
-    session["user_cache"] = {
-        "id": user["id"], "nombre": user["nombre"], "apellido": user["apellido"],
-        "email": user["email"], "rol": user["rol"], "activo": 1,
-        "password_hash": "", "fecha_creacion": "", "ultimo_acceso": "",
-    }
 
     token = generate_token(user)
     db.close()
@@ -925,7 +911,7 @@ def api_health():
         db = get_db()
         user_count = db.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0]
         db.close()
-        return jsonify({"status": "ok", "usuarios": user_count, "vercel": _IS_VERCEL})
+        return jsonify({"status": "ok", "usuarios": user_count})
     except Exception as e:
         return jsonify({"status": "error", "detail": str(e)}), 500
 

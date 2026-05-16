@@ -8,9 +8,7 @@ import uuid
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# On Vercel the filesystem is read-only except /tmp
-_IS_VERCEL = os.environ.get("VERCEL") == "1"
-DB_PATH = "/tmp/nomisalud.db" if _IS_VERCEL else os.path.join(os.path.dirname(__file__), "nomisalud.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "nomisalud.db")
 
 
 def get_db():
