@@ -28,6 +28,9 @@ nomisalud/
 
 Abrir **http://localhost:5000** en el navegador.
 
+pip install -requirements.txt
+python app.py
+
 ## Cuentas de demostración
 
 | Email | Contraseña | Rol |
